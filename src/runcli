@@ -33,7 +33,6 @@ const hasCommand = (cli, command) => {
   const argv = process.argv;
   const command = argv[2];
   for (const searchPath of searchPaths) {
-    console.log("searchPath", searchPath);
     try {
       const cli = build()
         .brand("runcli")
