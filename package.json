@@ -1,0 +1,26 @@
+{
+  "name": "run-cli",
+  "version": "1.0.0",
+  "private": true,
+  "main": "dist/index.js",
+  "author": "Hung Tran <hungtran0203@gmail.com>",
+  "license": "MIT",
+  "bin": {
+    "runcli": "src/runcli"
+  },
+  "scripts": {
+    "dev": "echo dev",
+    "setup": "yarn link"
+  },
+  "dependencies": {
+    "dotenv": "^6.1.0",
+    "fs-extra": "^9.1.0",
+    "klaw-sync": "^6.0.0",
+    "gluegun": "^5.1.2",
+    "lodash": "^4.17.11"
+  },
+  "devDependencies": {
+    "jest": "^23.6.0",
+    "nodemon": "^1.11.0"
+  }
+}

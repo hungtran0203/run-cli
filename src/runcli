@@ -1,0 +1,54 @@
+#!/usr/bin/env node
+
+const fs = require("fs-extra");
+const path = require("path");
+const _ = require("lodash");
+const { build } = require("gluegun");
+
+const CLI_FOLDERS = [".cli", "cli", ".scripts", "scripts"];
+
+const searchPaths = (() => {
+  const cwd = process.cwd();
+  const levels = cwd.split(path.sep);
+  const rtn = levels.reduce((acc, level, cindex, arr) => {
+    CLI_FOLDERS.map((folder) => {
+      const dir = arr
+        .slice(0, cindex + 1)
+        .concat([folder])
+        .join(path.sep);
+      fs.existsSync(dir) && acc.push(dir);
+    });
+    return acc;
+  }, []);
+  return rtn;
+})();
+
+const hasCommand = (cli, command) => {
+  const commands = (cli && cli.commands) || [];
+  const found = commands.find(({ name }) => name === command);
+  return !!found;
+};
+
+(async () => {
+  const argv = process.argv;
+  const command = argv[2];
+  for (const searchPath of searchPaths) {
+    console.log("searchPath", searchPath);
+    try {
+      const cli = build()
+        .brand("runcli")
+        .src(searchPath)
+        .plugins("./node_modules", { matching: "runcli-*", hidden: true })
+        .help() // provides default for help, h, --help, -h
+        .version() // provides default for version, v, --version, -v
+        .create();
+      if (hasCommand(cli, command)) {
+        const toolbox = await cli.run(argv);
+        return toolbox;
+      }
+    } catch (err) {
+      // console.log(err)
+    }
+  }
+  console.log(`command${command ? `: "${command}"` : ""} not found`);
+})();
