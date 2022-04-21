@@ -5,7 +5,7 @@ const path = require("path");
 const _ = require("lodash");
 const { build } = require("gluegun");
 
-const CLI_FOLDERS = [".cli", "cli", ".scripts", "scripts"];
+const CLI_FOLDERS = [".cli", "cli", ".scripts", "scripts", ".runcli"];
 
 const searchPaths = (() => {
   const cwd = process.cwd();
