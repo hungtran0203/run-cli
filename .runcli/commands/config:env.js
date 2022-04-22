@@ -46,6 +46,9 @@ module.exports = {
           const { configFile, configName } = file;
           const srcFile = file.path;
           const dstFile = path.join(cwd, configFile);
+          toolbox.print.info(
+            `${toolbox.print.checkmark} Applying config/env ${configFile}`
+          );
           toolbox.filesystem.copy(srcFile, dstFile, { overwrite: true });
         }
       });
