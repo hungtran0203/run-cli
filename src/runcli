@@ -7,21 +7,23 @@ const { build } = require("gluegun");
 
 const CLI_FOLDERS = [".cli", "cli", ".scripts", "scripts", ".runcli"];
 
-const searchPaths = (() => {
-  const cwd = process.cwd();
+const searchParentPaths = (cwd, folders = CLI_FOLDERS) => {
   const levels = cwd.split(path.sep);
   const rtn = levels.reduce((acc, level, cindex, arr) => {
-    CLI_FOLDERS.map((folder) => {
-      const dir = arr
-        .slice(0, cindex + 1)
-        .concat([folder])
-        .join(path.sep);
+    let pathLevels = arr.slice(0, cindex + 1);
+    folders.map((folder) => {
+      const dir = pathLevels.concat([folder]).join(path.sep);
       fs.existsSync(dir) && acc.push(dir);
     });
     return acc;
   }, []);
   return rtn;
-})();
+};
+
+const searchPaths = _.uniq([
+  ...searchParentPaths(process.cwd()),
+  ...searchParentPaths(__dirname),
+]);
 
 const hasCommand = (cli, command) => {
   const commands = (cli && cli.commands) || [];
@@ -42,6 +44,7 @@ const hasCommand = (cli, command) => {
         .version() // provides default for version, v, --version, -v
         .create();
       if (hasCommand(cli, command)) {
+        _.merge(cli, { utils: { searchParentPaths } });
         const toolbox = await cli.run(argv);
         return toolbox;
       }
