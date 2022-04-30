@@ -3,9 +3,7 @@ const _ = require("lodash");
 const path = require("path");
 
 const isEnvConfigFile = (file, { env, configFolder }) => {
-  const basename = path.basename(file.path);
   const dirname = path.dirname(file.path);
-  const extname = path.extname(file.path);
   const fileInfo = path.parse(file.path);
   let configName;
   const prefixEnv = `${env}.`;
