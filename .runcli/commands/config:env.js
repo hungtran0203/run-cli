@@ -23,20 +23,37 @@ const isEnvConfigFile = (file, { env, configFolder }) => {
   return false;
 };
 
+const getPossibleConfigFolders = (cwd) => {
+  const levels = cwd.split(path.sep);
+  const dirList = _.reduceRight(
+    levels,
+    (acc, val, index) => {
+      if (index > 1) {
+        const dir = levels.slice(index);
+        acc.push(dir.join(path.sep));
+      }
+      return acc;
+    },
+    []
+  );
+  const folders = _.flatMap(
+    ["config", "env"].map((val) => {
+      return dirList.map((basename) => _.join([val, basename], path.sep));
+    })
+  );
+  return folders;
+};
+
 module.exports = {
   name: "config:env",
   run: async function (toolbox) {
     const cwd = process.cwd();
     toolbox.print.info(`${toolbox.print.checkmark} cwd: ${cwd}`);
-    const basename = path.basename(cwd);
-    const folders = ["config", "env"].map((val) =>
-      _.join([val, basename], path.sep)
-    );
+    const folders = getPossibleConfigFolders(cwd);
 
     const configFolders = toolbox.runtime.utils.searchParentPaths(cwd, folders);
     const configFolder = _.first(configFolders);
     const env = toolbox.parameters.first || "dev";
-
     if (env && configFolder) {
       let files = klawSync(configFolder, { nodir: true, depthLimit: 10 });
       files = _.map(files, (file) => {
